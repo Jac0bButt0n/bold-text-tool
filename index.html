@@ -52,16 +52,16 @@
     const input = document.getElementById("input");
     const output = document.getElementById("output");
 
-    const styles = {
-      "Bold": str => transform(str, 0x1D400, 0x1D41A),
-      "Italic": str => transform(str, 0x1D434, 0x1D44E),
-      "Bold Italic": str => transform(str, 0x1D468, 0x1D482),
-      "Monospace": str => transform(str, 0x1D670, 0x1D68A),
-      "Script": str => transform(str, 0x1D49C, 0x1D4B6, true),
-      "Fraktur": str => transform(str, 0x1D504, 0x1D51E, true),
-      "Circled": str => transformSpecial(str, 0x24B6, 0x24D0),
-      "Squared": str => transformSpecial(str, 0x1F130, null, true),
-      "Tiny": str => str.toLowerCase().split('').map(c => tiny[c] || c).join('')
+   const styles = {
+  "Bold": str => transform(str, 0x1D400, 0x1D41A, false, 0x1D7CE),
+  "Italic": str => transform(str, 0x1D434, 0x1D44E),
+  "Bold Italic": str => transform(str, 0x1D468, 0x1D482, false, 0x1D7CE),
+  "Monospace": str => transform(str, 0x1D670, 0x1D68A, false, 0x1D7F6),
+  "Script": str => transform(str, 0x1D49C, 0x1D4B6, true),
+  "Fraktur": str => transform(str, 0x1D504, 0x1D51E, true),
+  "Circled": str => transformSpecial(str, 0x24B6, 0x24D0),
+  "Squared": str => transformSpecial(str, 0x1F130, null, true),
+  "Tiny": str => str.toLowerCase().split('').map(c => tiny[c] || c).join('')
     };
 
     const tiny = {
@@ -71,21 +71,23 @@
       v: 'ᴠ', w: 'ᴡ', x: 'x', y: 'ʏ', z: 'ᴢ'
     };
 
-    function transform(str, upperStart, lowerStart, skipChars = false) {
-      return Array.from(str).map(c => {
-        const code = c.codePointAt(0);
-        if (c >= 'A' && c <= 'Z') {
-          return String.fromCodePoint(upperStart + (code - 65));
-        } else if (c >= 'a' && c <= 'z') {
-          return String.fromCodePoint(lowerStart + (code - 97));
-        } else if (!skipChars) {
-          return c;
-        } else {
-          return '';
-        }
-      }).join('');
+function transform(str, upperStart, lowerStart, skipChars = false, numberStart = null) {
+  return Array.from(str).map(c => {
+    const code = c.codePointAt(0);
+    if (c >= 'A' && c <= 'Z') {
+      return String.fromCodePoint(upperStart + (code - 65));
+    } else if (c >= 'a' && c <= 'z') {
+      return String.fromCodePoint(lowerStart + (code - 97));
+    } else if (numberStart && c >= '0' && c <= '9') {
+      return String.fromCodePoint(numberStart + (code - 48));
+    } else if (!skipChars) {
+      return c;
+    } else {
+      return '';
     }
-
+  }).join('');
+}
+    
     function transformSpecial(str, upperStart, lowerStart, isBlocky = false) {
       return Array.from(str).map(c => {
         const code = c.codePointAt(0);
